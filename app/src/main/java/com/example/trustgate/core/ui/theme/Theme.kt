@@ -13,6 +13,7 @@ private val DarkColorScheme = darkColorScheme(
     primary = LightBluePrimaryDark,
     secondary = GraySecondaryDark,
     background = BlueBackgroundDark,
+    surfaceVariant = BlueBackgroundLowDark,
     onPrimary = WhiteOnPrimaryDark,
     onSecondary = GrayOnSecondaryDark,
     onTertiary = BlueOnTertiaryDark,

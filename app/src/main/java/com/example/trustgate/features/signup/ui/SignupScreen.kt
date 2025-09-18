@@ -24,7 +24,8 @@ import com.example.trustgate.core.ui.components.TitleText
 @Preview(showBackground = true)
 @Composable
 fun SignupScreen(
-    onSignupClick: () -> Unit = {}
+    onSignupClick: () -> Unit = {},
+    onLoginClick: () -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -78,7 +79,7 @@ fun SignupScreen(
         ComposedTextButton(
             staticText = "¿Ya tienes una cuenta?",
             buttonText = "Inicia Sesión",
-            onClick = onSignupClick
+            onClick = onLoginClick
         )
     }
 }
