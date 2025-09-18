@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.example.trustgate.R
 import com.example.trustgate.core.ui.components.ComposedTextButton
 import com.example.trustgate.core.ui.components.ContinueButton
+import com.example.trustgate.core.ui.components.SmallSectionSpacer
 import com.example.trustgate.core.ui.components.TitleText
 
 @Preview(showBackground = true)
@@ -35,13 +35,13 @@ fun LoginScreen(
     onLoginClick: () -> Unit = {},
     onSignupClick: () -> Unit = {}
 ) {
-    var password by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 25.dp, vertical = 65.dp),
+            .padding(horizontal = 25.dp, vertical = 75.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
@@ -64,6 +64,8 @@ fun LoginScreen(
             textAlign = TextAlign.Center
         )
 
+        SmallSectionSpacer()
+
         PersonalizedTextField(
             label = "Correo electrónico",
             labelStyle = MaterialTheme.typography.labelSmall,
@@ -72,7 +74,7 @@ fun LoginScreen(
         ) { email = it }
 
         PersonalizedTextField(
-            label = "Password",
+            label = "Contraseña",
             labelStyle = MaterialTheme.typography.labelSmall,
             labelColor = MaterialTheme.colorScheme.onSecondary,
             value = password
@@ -86,6 +88,8 @@ fun LoginScreen(
             textAlign = TextAlign.End
         )
 
+        SmallSectionSpacer()
+
         ContinueButton(
             label = "Iniciar Sesión",
             labelStyle = MaterialTheme.typography.labelSmall,
@@ -93,7 +97,7 @@ fun LoginScreen(
             onClick = onLoginClick
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.weight(1f))
 
         ComposedTextButton(
             staticText = "¿No tienes una cuenta?",
