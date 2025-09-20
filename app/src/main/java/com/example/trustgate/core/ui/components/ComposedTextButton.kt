@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ComposedTextButton(
+    modifier: Modifier = Modifier,
     staticText: String,
     buttonText: String,
     onClick: () -> Unit

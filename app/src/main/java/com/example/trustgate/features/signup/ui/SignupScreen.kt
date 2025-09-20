@@ -7,10 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,13 +20,10 @@ import com.example.trustgate.core.ui.components.TitleText
 @Preview(showBackground = true)
 @Composable
 fun SignupScreen(
+    viewModel: SignupViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     onSignupClick: () -> Unit = {},
     onLoginClick: () -> Unit = {}
 ) {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,22 +41,25 @@ fun SignupScreen(
             label = "Nombre",
             labelStyle = MaterialTheme.typography.labelSmall,
             labelColor = MaterialTheme.colorScheme.onSecondary,
-            value = name
-        ) { name = it }
+            value = viewModel.name,
+            onValueChange = viewModel::onNameChange
+        )
 
         PersonalizedTextField(
             label = "Correo electrónico",
             labelStyle = MaterialTheme.typography.labelSmall,
             labelColor = MaterialTheme.colorScheme.onSecondary,
-            value = email
-        ) { email = it }
+            value = viewModel.email,
+            onValueChange = viewModel::onEmailChange
+        )
 
         PersonalizedTextField(
             label = "Contraseña",
             labelStyle = MaterialTheme.typography.labelSmall,
             labelColor = MaterialTheme.colorScheme.onSecondary,
-            value = password
-        ) { password = it }
+            value = viewModel.password,
+            onValueChange = viewModel::onPasswordChange
+        )
 
         SmallSectionSpacer()
 

@@ -4,21 +4,23 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialogDefaults.containerColor
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.trustgate.core.ui.components.PersonalizedTextField
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -32,12 +34,10 @@ import com.example.trustgate.core.ui.components.TitleText
 @Preview(showBackground = true)
 @Composable
 fun LoginScreen(
+    viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     onLoginClick: () -> Unit = {},
     onSignupClick: () -> Unit = {}
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -70,15 +70,17 @@ fun LoginScreen(
             label = "Correo electrónico",
             labelStyle = MaterialTheme.typography.labelSmall,
             labelColor = MaterialTheme.colorScheme.onSecondary,
-            value = email
-        ) { email = it }
+            value = viewModel.email,
+            onValueChange = viewModel::onEmailChange
+        )
 
         PersonalizedTextField(
             label = "Contraseña",
             labelStyle = MaterialTheme.typography.labelSmall,
             labelColor = MaterialTheme.colorScheme.onSecondary,
-            value = password
-        ) { password = it }
+            value = viewModel.password,
+            onValueChange = viewModel::onPasswordChange
+        )
 
         Text(
             text = "Olvidaste tu contraseña?",
@@ -100,6 +102,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         ComposedTextButton(
+            modifier = Modifier.navigationBarsPadding(),
             staticText = "¿No tienes una cuenta?",
             buttonText = "Regístrate",
             onClick = onSignupClick
