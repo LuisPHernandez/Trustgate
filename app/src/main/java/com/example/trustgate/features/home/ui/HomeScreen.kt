@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,7 +29,8 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    onScanClick: () -> Unit
 ) {
     val applicationContext = LocalContext.current
     val controller = remember {
@@ -44,7 +46,7 @@ fun HomeScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Trustgate",
+                        text = "Bienvenido a Trustgate",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                     )
@@ -80,6 +82,13 @@ fun HomeScreen(
                     controller = controller,
                     modifier = Modifier.fillMaxSize()
                 )
+            }
+
+            Button(
+                onClick = { onScanClick() },
+                modifier = Modifier.padding(top = 24.dp)
+            ) {
+                Text(text = "Escanear")
             }
         }
     }

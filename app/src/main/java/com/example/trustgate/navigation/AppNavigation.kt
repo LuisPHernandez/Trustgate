@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.trustgate.features.home.ui.HomeScreen
+import com.example.trustgate.features.home.ui.SuccessScreen
 import com.example.trustgate.features.login.ui.LoginScreen
 import com.example.trustgate.features.signup.ui.SignupScreen
 import com.example.trustgate.features.verification.navigation.VerificationNavigation
@@ -60,8 +61,15 @@ fun AppNavigation(
                     navController.navigate(AppScreens.Login.route) {
                         popUpTo(AppScreens.Home.route) { inclusive = true }
                     }
+                },
+                onScanClick = {
+                    navController.navigate(AppScreens.Success.route)
                 }
             )
+        }
+
+        composable(AppScreens.Success.route) {
+            SuccessScreen()
         }
     }
 }
