@@ -69,7 +69,14 @@ fun AppNavigation(
         }
 
         composable(AppScreens.Success.route) {
-            SuccessScreen()
+            SuccessScreen(onGoHome ={
+                navController.navigate(AppScreens.Home.route){
+                    popUpTo(AppScreens.Success.route) { inclusive = true }
+                    launchSingleTop = true
+                }
+            } )
+
         }
+
     }
 }
