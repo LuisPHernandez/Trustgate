@@ -9,12 +9,13 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 
 @Composable
 fun HomeCameraPreview(
-    controller: LifecycleCameraController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    controller: LifecycleCameraController
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     AndroidView(
+        modifier = modifier,
         factory = {
             PreviewView(it).apply {
                 this.controller = controller

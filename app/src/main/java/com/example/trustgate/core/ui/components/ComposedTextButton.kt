@@ -22,8 +22,7 @@ fun ComposedTextButton(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = modifier,
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {

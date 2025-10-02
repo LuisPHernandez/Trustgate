@@ -1,8 +1,10 @@
 package com.example.trustgate.features.home.ui
 
+import androidx.camera.core.CameraSelector
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,7 +31,7 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
 ) {
     val applicationContext = LocalContext.current
     val controller = remember {
@@ -76,10 +79,32 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.medium
             ) {
-                HomeCameraPreview(
-                    controller = controller,
-                    modifier = Modifier.fillMaxSize()
-                )
+                Box(
+                    Modifier.fillMaxSize()
+                ) {
+                    HomeCameraPreview(
+                        modifier = Modifier.fillMaxSize(),
+                        controller = controller
+                    )
+
+                    IconButton(
+                        onClick = {
+                            controller.cameraSelector = if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
+                                CameraSelector.DEFAULT_FRONT_CAMERA
+                            } else {
+                                CameraSelector.DEFAULT_BACK_CAMERA
+                            }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Cameraswitch,
+                            contentDescription = "Logout"
+                        )
+                    }
+                }
             }
         }
     }

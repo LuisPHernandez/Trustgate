@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -73,6 +74,7 @@ fun SignupScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         ComposedTextButton(
+            modifier = Modifier.navigationBarsPadding(),
             staticText = "¿Ya tienes una cuenta?",
             buttonText = "Inicia Sesión",
             onClick = onLoginClick
