@@ -1,10 +1,8 @@
 package com.example.trustgate.features.home.ui
 
-import androidx.camera.core.CameraSelector
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.Cameraswitch
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +30,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HomeScreen(
     onLogoutClick: () -> Unit,
+    onScanClick: () -> Unit
 ) {
     val applicationContext = LocalContext.current
     val controller = remember {
@@ -47,7 +46,7 @@ fun HomeScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Trustgate",
+                        text = "Bienvenido a Trustgate",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                     )
@@ -79,32 +78,17 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.medium
             ) {
-                Box(
-                    Modifier.fillMaxSize()
-                ) {
-                    HomeCameraPreview(
-                        modifier = Modifier.fillMaxSize(),
-                        controller = controller
-                    )
+                HomeCameraPreview(
+                    controller = controller,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
-                    IconButton(
-                        onClick = {
-                            controller.cameraSelector = if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
-                                CameraSelector.DEFAULT_FRONT_CAMERA
-                            } else {
-                                CameraSelector.DEFAULT_BACK_CAMERA
-                            }
-                        },
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Cameraswitch,
-                            contentDescription = "Logout"
-                        )
-                    }
-                }
+            Button(
+                onClick = { onScanClick() },
+                modifier = Modifier.padding(top = 24.dp)
+            ) {
+                Text(text = "Escanear")
             }
         }
     }
