@@ -4,13 +4,14 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.trustgate.core.ui.components.ContinueButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,11 +86,20 @@ fun HomeScreen(
                 )
             }
 
-            Button(
-                onClick = { onScanClick() },
-                modifier = Modifier.padding(top = 24.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = "Escanear")
+                ContinueButton(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .height(55.dp),
+                    label = "Escanear",
+                    labelStyle = MaterialTheme.typography.labelSmall,
+                    labelColor = MaterialTheme.colorScheme.onPrimary,
+                    onClick = onScanClick
+                )
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.example.trustgate.features.home.ui
+package com.example.trustgate.features.success.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.trustgate.core.ui.components.ContinueButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -18,7 +19,13 @@ fun SuccessScreen(onGoHome: () -> Unit) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Trustgate") }
+                title = {
+                    Text(
+                        text = "Trustgate",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
             )
         }
     ) { innerPadding ->
@@ -50,15 +57,21 @@ fun SuccessScreen(onGoHome: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(24.dp))
 
-            Button(onClick = onGoHome){
-                Text("Regresar")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                ContinueButton(
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f)
+                        .height(55.dp),
+                    label = "Regresar",
+                    labelStyle = MaterialTheme.typography.labelSmall,
+                    labelColor = MaterialTheme.colorScheme.onPrimary,
+                    onClick = onGoHome
+                )
             }
-
-
-
-
-
-
         }
     }
 }

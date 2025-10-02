@@ -1,6 +1,5 @@
 package com.example.trustgate.features.verification.navigation
 
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -15,7 +14,7 @@ import com.example.trustgate.features.verification.ui.photo.VerificationPhotoScr
 fun VerificationNavigation(
     innerNavController: NavHostController = rememberNavController(),
     viewModel: VerificationViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
-    onFinish: (Uri) -> Unit
+    onFinish: () -> Unit
 ) {
     VerificationShell {
         NavHost(
@@ -33,9 +32,7 @@ fun VerificationNavigation(
             }
             composable(VerificationInnerScreens.Photo.route) {
                 VerificationPhotoScreen(
-                    onContinue = { uri ->
-                        onFinish(uri)
-                    }
+                    onContinue = onFinish
                 )
             }
         }

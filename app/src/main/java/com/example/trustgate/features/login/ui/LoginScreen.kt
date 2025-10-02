@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -88,6 +89,9 @@ fun LoginScreen(
         SmallSectionSpacer()
 
         ContinueButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(55.dp),
             label = "Iniciar Sesión",
             labelStyle = MaterialTheme.typography.labelSmall,
             labelColor = MaterialTheme.colorScheme.onPrimary,
