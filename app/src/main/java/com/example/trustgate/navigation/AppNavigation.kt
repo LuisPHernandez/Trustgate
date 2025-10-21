@@ -5,11 +5,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.trustgate.features.home.ui.HomeScreen
-import com.example.trustgate.features.success.ui.SuccessScreen
-import com.example.trustgate.features.login.ui.LoginScreen
-import com.example.trustgate.features.signup.ui.SignupScreen
-import com.example.trustgate.features.verification.navigation.VerificationNavigation
+import com.example.trustgate.presentation.features.home.ui.HomeScreen
+import com.example.trustgate.presentation.features.success.ui.SuccessScreen
+import com.example.trustgate.presentation.features.login.ui.LoginScreen
+import com.example.trustgate.presentation.features.signup.ui.SignupScreen
+import com.example.trustgate.presentation.features.verification.navigation.VerificationNavigation
 
 @Composable
 fun AppNavigation(
