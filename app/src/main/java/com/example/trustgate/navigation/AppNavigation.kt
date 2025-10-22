@@ -1,13 +1,19 @@
 package com.example.trustgate.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.trustgate.data.auth.AuthRepositoryImpl
+import com.example.trustgate.data.auth.simulated.AuthSimulatedDataSource
 import com.example.trustgate.presentation.features.home.ui.HomeScreen
 import com.example.trustgate.presentation.features.success.ui.SuccessScreen
 import com.example.trustgate.presentation.features.login.ui.LoginScreen
+import com.example.trustgate.presentation.features.login.viewmodel.LoginViewModel
+import com.example.trustgate.presentation.features.login.viewmodel.LoginViewModelFactory
 import com.example.trustgate.presentation.features.signup.ui.SignupScreen
 import com.example.trustgate.presentation.features.verification.navigation.VerificationNavigation
 
@@ -20,8 +26,13 @@ fun AppNavigation(
         startDestination = AppScreens.Login.route
     ) {
         composable(AppScreens.Login.route) {
+            val repo = remember { AuthRepositoryImpl(AuthSimulatedDataSource()) }
+            val vm: LoginViewModel = viewModel(factory = LoginViewModelFactory(repo))
+
+
             LoginScreen(
-                onLoginClick = {
+                viewModel = vm,
+                onLoginSuccess = {
                     navController.navigate(AppScreens.Home.route) {
                         popUpTo(AppScreens.Login.route) { inclusive = true }
                     }
