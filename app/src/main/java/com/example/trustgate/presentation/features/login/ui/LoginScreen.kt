@@ -59,11 +59,11 @@ fun LoginScreen(
     }
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) })
-    { padding ->
+    { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(innerPadding)
                 .padding(horizontal = 25.dp, vertical = 75.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)

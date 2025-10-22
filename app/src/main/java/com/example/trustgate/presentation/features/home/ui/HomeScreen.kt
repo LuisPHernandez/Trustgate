@@ -18,22 +18,55 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.trustgate.core.ui.components.ContinueButton
+import com.example.trustgate.domain.model.GateScanResult
+import com.example.trustgate.presentation.features.home.viewmodel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     onLogoutClick: () -> Unit,
-    onScanClick: () -> Unit
+    onSuccess: (gateName: String) -> Unit,
 ) {
+    val result = viewModel.lastResult
+    val error = viewModel.error
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Navegar cuando hay scan exitoso
+    LaunchedEffect(result) {
+        when (result) {
+            is GateScanResult.Success -> {
+                onSuccess(result.gate.name)
+                viewModel.clear()
+            }
+            GateScanResult.Denied -> {
+                snackbarHostState.showSnackbar("Acceso denegado")
+                viewModel.clear()
+            }
+            null -> Unit
+        }
+    }
+
+    // Mostrar error de flujo
+    LaunchedEffect(error) {
+        error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clear()
+        }
+    }
+
     val applicationContext = LocalContext.current
     val controller = remember {
         LifecycleCameraController(applicationContext).apply {
@@ -44,6 +77,7 @@ fun HomeScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -95,10 +129,11 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .height(55.dp),
-                    label = "Escanear",
+                    label = if (viewModel.isScanning) "Escaneando..." else "Escanear",
                     labelStyle = MaterialTheme.typography.labelSmall,
                     labelColor = MaterialTheme.colorScheme.onPrimary,
-                    onClick = onScanClick
+                    onClick = { viewModel.scan() },
+                    enabled = !viewModel.isScanning
                 )
             }
         }

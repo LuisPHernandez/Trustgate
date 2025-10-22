@@ -9,7 +9,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.trustgate.data.auth.AuthRepositoryImpl
 import com.example.trustgate.data.auth.simulated.AuthSimulatedDataSource
+import com.example.trustgate.data.gate.GateRepositoryImpl
+import com.example.trustgate.data.gate.simulated.GateSimulatedDataSource
 import com.example.trustgate.presentation.features.home.ui.HomeScreen
+import com.example.trustgate.presentation.features.home.viewmodel.HomeViewModel
+import com.example.trustgate.presentation.features.home.viewmodel.HomeViewModelFactory
 import com.example.trustgate.presentation.features.success.ui.SuccessScreen
 import com.example.trustgate.presentation.features.login.ui.LoginScreen
 import com.example.trustgate.presentation.features.login.viewmodel.LoginViewModel
@@ -26,8 +30,8 @@ fun AppNavigation(
         startDestination = AppScreens.Login.route
     ) {
         composable(AppScreens.Login.route) {
-            val repo = remember { AuthRepositoryImpl(AuthSimulatedDataSource()) }
-            val vm: LoginViewModel = viewModel(factory = LoginViewModelFactory(repo))
+            val authRepo = remember { AuthRepositoryImpl(AuthSimulatedDataSource()) }
+            val vm: LoginViewModel = viewModel(factory = LoginViewModelFactory(authRepo))
 
 
             LoginScreen(
@@ -67,13 +71,17 @@ fun AppNavigation(
         }
 
         composable(AppScreens.Home.route) {
+            val gateRepo = remember { GateRepositoryImpl(GateSimulatedDataSource()) }
+            val vm: HomeViewModel = viewModel(factory = HomeViewModelFactory(gateRepo))
+
             HomeScreen(
+                viewModel = vm,
                 onLogoutClick = {
                     navController.navigate(AppScreens.Login.route) {
                         popUpTo(AppScreens.Home.route) { inclusive = true }
                     }
                 },
-                onScanClick = {
+                onSuccess = { gateName ->
                     navController.navigate(AppScreens.Success.route)
                 }
             )

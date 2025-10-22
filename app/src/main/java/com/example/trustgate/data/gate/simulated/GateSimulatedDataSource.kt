@@ -21,7 +21,7 @@ class GateSimulatedDataSource(
             throw RuntimeException("Error de conexión al servidor del portón")
         }
 
-        // Decidimos aleatoriamente si el acceso fue concedido o negado
+        // Se decide aleatoriamente si el acceso fue concedido o negado
         val granted = Random.nextBoolean()
         if (granted) {
             val randomId = Random.nextInt(1, 2)
