@@ -57,9 +57,10 @@ fun LoginScreen(
     LaunchedEffect(viewModel.error) {
         viewModel.error?.let { snackbarHostState.showSnackbar(it) }
     }
+
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) })
-    { innerPadding ->
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

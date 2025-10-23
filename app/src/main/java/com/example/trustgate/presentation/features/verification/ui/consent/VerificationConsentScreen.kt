@@ -25,13 +25,16 @@ import androidx.compose.ui.unit.dp
 import com.example.trustgate.core.ui.components.BulletedRow
 import com.example.trustgate.core.ui.components.ContinueButton
 import com.example.trustgate.core.ui.components.TitleText
+import com.example.trustgate.domain.model.VerificationStatus
+import com.example.trustgate.presentation.features.verification.viewmodel.VerificationViewModel
 
 @Composable
 fun VerificationConsentScreen(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+    viewModel: VerificationViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     onContinueClick: () -> Unit = {}
 ) {
+    val checked = viewModel.consent
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -82,7 +85,7 @@ fun VerificationConsentScreen(
         ) {
             Checkbox(
                 checked = checked,
-                onCheckedChange = onCheckedChange
+                onCheckedChange = { viewModel.onConsentChange() }
             )
 
             Spacer(Modifier.width(8.dp))
@@ -106,7 +109,8 @@ fun VerificationConsentScreen(
             label = "Continuar",
             labelStyle = MaterialTheme.typography.labelSmall,
             labelColor = MaterialTheme.colorScheme.onPrimary,
-            onClick = onContinueClick
+            onClick = onContinueClick,
+            enabled = if (viewModel.status == VerificationStatus.NotStarted) false else checked
         )
     }
 }
