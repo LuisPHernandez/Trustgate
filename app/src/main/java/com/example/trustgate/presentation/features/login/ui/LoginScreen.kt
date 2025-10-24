@@ -34,6 +34,7 @@ import com.example.trustgate.core.ui.components.SmallSectionSpacer
 import com.example.trustgate.core.ui.components.TitleText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trustgate.presentation.features.login.viewmodel.LoginViewModel
 
 @Preview(showBackground = true)
@@ -43,19 +44,19 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit = {},
     onSignupClick: () -> Unit = {}
 ) {
-    val session = viewModel.session
+    val state by viewModel.ui.collectAsStateWithLifecycle()
     var navigated by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(session) {
-        if (session != null && !navigated) {
+    LaunchedEffect(state.session) {
+        if (state.session != null && !navigated) {
             navigated = true
             onLoginSuccess()
         }
     }
 
-    LaunchedEffect(viewModel.error) {
-        viewModel.error?.let { snackbarHostState.showSnackbar(it) }
+    LaunchedEffect(state.error) {
+        state.error?.let { snackbarHostState.showSnackbar(it) }
     }
 
     Scaffold(
@@ -94,7 +95,7 @@ fun LoginScreen(
                 label = "Correo electrónico",
                 labelStyle = MaterialTheme.typography.labelSmall,
                 labelColor = MaterialTheme.colorScheme.onSecondary,
-                value = viewModel.email,
+                value = state.email,
                 onValueChange = viewModel::onEmailChange
             )
 
@@ -102,7 +103,7 @@ fun LoginScreen(
                 label = "Contraseña",
                 labelStyle = MaterialTheme.typography.labelSmall,
                 labelColor = MaterialTheme.colorScheme.onSecondary,
-                value = viewModel.password,
+                value = state.password,
                 onValueChange = viewModel::onPasswordChange
             )
 
@@ -120,11 +121,11 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp),
-                label = if (viewModel.isLoading) "Inciando Sesión..." else "Iniciar Sesión",
+                label = if (state.isLoading) "Inciando Sesión..." else "Iniciar Sesión",
                 labelStyle = MaterialTheme.typography.labelSmall,
                 labelColor = MaterialTheme.colorScheme.onPrimary,
                 onClick = { viewModel.submit() },
-                enabled = !viewModel.isLoading
+                enabled = !state.isLoading
             )
 
             Spacer(modifier = Modifier.weight(1f))

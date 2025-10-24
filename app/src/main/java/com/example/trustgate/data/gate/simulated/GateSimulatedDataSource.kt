@@ -10,7 +10,7 @@ import kotlin.random.Random
 // Fuente de datos simulada para el escaneo del portón
 class GateSimulatedDataSource(
     private val latencyMs: Long = 1500L,    // Para simular la latencia de red
-    private val failRate: Float = 0.2f      // Para simular errores de red (20% de probabilidad)
+    private val failRate: Float = 0.5f      // Para simular errores de red (50% de probabilidad)
 ) {
     fun scanGate(): Flow<GateScanResult> = flow {
         // Se simula la latencia

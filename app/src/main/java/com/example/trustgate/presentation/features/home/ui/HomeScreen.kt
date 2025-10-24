@@ -24,11 +24,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trustgate.core.ui.components.ContinueButton
 import com.example.trustgate.domain.model.GateScanResult
 import com.example.trustgate.presentation.features.home.viewmodel.HomeViewModel
@@ -40,15 +42,14 @@ fun HomeScreen(
     onLogoutClick: () -> Unit,
     onSuccess: (gateName: String) -> Unit,
 ) {
-    val result = viewModel.lastResult
-    val error = viewModel.error
+    val state by viewModel.ui.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Navegar cuando hay scan exitoso
-    LaunchedEffect(result) {
-        when (result) {
+    LaunchedEffect(state.lastResult) {
+        when (state.lastResult) {
             is GateScanResult.Success -> {
-                onSuccess(result.gate.name)
+                onSuccess((state.lastResult as GateScanResult.Success).gate.name)
                 viewModel.clear()
             }
             GateScanResult.Denied -> {
@@ -60,8 +61,8 @@ fun HomeScreen(
     }
 
     // Mostrar error de flujo
-    LaunchedEffect(error) {
-        error?.let {
+    LaunchedEffect(state.error) {
+        state.error?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clear()
         }
@@ -129,11 +130,11 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .height(55.dp),
-                    label = if (viewModel.isScanning) "Escaneando..." else "Escanear",
+                    label = if (state.isScanning) "Escaneando..." else "Escanear",
                     labelStyle = MaterialTheme.typography.labelSmall,
                     labelColor = MaterialTheme.colorScheme.onPrimary,
                     onClick = { viewModel.scan() },
-                    enabled = !viewModel.isScanning
+                    enabled = !state.isScanning
                 )
             }
         }

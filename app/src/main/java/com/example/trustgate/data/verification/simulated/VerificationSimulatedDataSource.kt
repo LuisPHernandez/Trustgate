@@ -7,7 +7,7 @@ import kotlin.random.Random
 // Fuente de datos simulada para la verificación de identidad
 class VerificationSimulatedDataSource(
     private val latencyMs: Long = 1200L,    // Para simular la latencia de red
-    private val failRate: Float = 0.1f      // Para simular errores de red (10% de probabilidad)
+    private val failRate: Float = 0.5f      // Para simular errores de red (50% de probabilidad)
 ) {
     private var status: VerificationStatus = VerificationStatus.NotStarted
 

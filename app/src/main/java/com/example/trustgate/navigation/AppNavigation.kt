@@ -64,7 +64,7 @@ fun AppNavigation(
             VerificationNavigation(
                 onFinish = {
                     navController.navigate(AppScreens.Home.route) {
-                        popUpTo(AppScreens.Login.route) { inclusive = true }
+                        popUpTo(AppScreens.Verification.route) { inclusive = true }
                     }
                 }
             )
