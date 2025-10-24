@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: androidx.camera.viewfinder:viewfinder-compose:1.5.0@aar" external-system-id="GRADLE">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/8.13/transforms/6e2b2acdae2c17b5e9d347d8e3dd437a/transformed/viewfinder-compose-1.5.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/8.13/transforms/6e2b2acdae2c17b5e9d347d8e3dd437a/transformed/viewfinder-compose-1.5.0/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/8.13/transforms/6e2b2acdae2c17b5e9d347d8e3dd437a/transformed/viewfinder-compose-1.5.0/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/androidx.camera.viewfinder/viewfinder-compose/1.5.0/d85a66a659bfb13128baa9e378b54ffa1b9ce3b4/viewfinder-compose-1.5.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
