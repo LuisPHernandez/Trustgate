@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "390186390191",
+    "project_id": "trustgate-942c2",
+    "storage_bucket": "trustgate-942c2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:390186390191:android:d5f71259fde2bf7256ba5a",
+        "android_client_info": {
+          "package_name": "com.example.trustgate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAIeJI3ApPXqty4yOrAYZMcxiNXD2-pjg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

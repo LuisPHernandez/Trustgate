@@ -13,10 +13,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.trustgate.core.ui.theme.TrustgateTheme
 import com.example.trustgate.presentation.features.login.ui.LoginScreen
 import com.example.trustgate.navigation.AppNavigation
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         enableEdgeToEdge()
         setContent {
             TrustgateTheme(dynamicColor = false) {

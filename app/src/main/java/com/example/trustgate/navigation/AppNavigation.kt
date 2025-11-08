@@ -11,6 +11,7 @@ import com.example.trustgate.data.auth.AuthRepositoryImpl
 import com.example.trustgate.data.auth.simulated.AuthSimulatedDataSource
 import com.example.trustgate.data.gate.GateRepositoryImpl
 import com.example.trustgate.data.gate.simulated.GateSimulatedDataSource
+import com.example.trustgate.presentation.features.auth.AuthViewModel
 import com.example.trustgate.presentation.features.home.ui.HomeScreen
 import com.example.trustgate.presentation.features.home.viewmodel.HomeViewModel
 import com.example.trustgate.presentation.features.home.viewmodel.HomeViewModelFactory
@@ -30,12 +31,11 @@ fun AppNavigation(
         startDestination = AppScreens.Login.route
     ) {
         composable(AppScreens.Login.route) {
-            val authRepo = remember { AuthRepositoryImpl(AuthSimulatedDataSource()) }
-            val vm: LoginViewModel = viewModel(factory = LoginViewModelFactory(authRepo))
+            val authViewModel: AuthViewModel = viewModel()
 
 
             LoginScreen(
-                viewModel = vm,
+                authViewModel = authViewModel,
                 onLoginSuccess = {
                     navController.navigate(AppScreens.Home.route) {
                         popUpTo(AppScreens.Login.route) { inclusive = true }
@@ -48,13 +48,17 @@ fun AppNavigation(
         }
 
         composable(AppScreens.Signup.route) {
+            val authViewModel: AuthViewModel = viewModel()
             SignupScreen(
-                onSignupClick = {
+                authViewModel = authViewModel,
+                onSignupSuccess = {
                     navController.navigate(AppScreens.Verification.route) {
+                        //se limpia para que no se pueda apachar la flechita atras y regresar
                         popUpTo(AppScreens.Login.route) { inclusive = true }
                     }
                 },
                 onLoginClick = {
+                    //regresa al login
                     navController.popBackStack()
                 }
             )

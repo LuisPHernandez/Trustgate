@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -17,6 +18,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,30 +36,44 @@ import com.example.trustgate.core.ui.components.SmallSectionSpacer
 import com.example.trustgate.core.ui.components.TitleText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.trustgate.presentation.features.auth.AuthUiState
+import com.example.trustgate.presentation.features.auth.AuthViewModel
 import com.example.trustgate.presentation.features.login.viewmodel.LoginViewModel
 
 @Preview(showBackground = true)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    authViewModel: AuthViewModel = viewModel(),
     onLoginSuccess: () -> Unit = {},
     onSignupClick: () -> Unit = {}
 ) {
-    val state by viewModel.ui.collectAsStateWithLifecycle()
-    var navigated by remember { mutableStateOf(false) }
+
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    val authState by authViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(state.session) {
-        if (state.session != null && !navigated) {
-            navigated = true
-            onLoginSuccess()
+    LaunchedEffect(authState) {
+        when (val currentState = authState) { // Usamos 'currentState' para evitar confusión
+            is AuthUiState.Success -> {
+                // Navegamos a la siguiente pantalla cuando el inicio de sesión es exitoso.
+                onLoginSuccess()
+            }
+            is AuthUiState.Error -> {
+                // Mostramos el error en un Snackbar y luego reseteamos el estado.
+                snackbarHostState.showSnackbar(currentState.message)
+                authViewModel.resetState() // Limpia el estado de error
+            }
+            else -> {
+                // No hacemos nada en los estados Idle o Loading
+            }
         }
     }
 
-    LaunchedEffect(state.error) {
-        state.error?.let { snackbarHostState.showSnackbar(it) }
-    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -95,16 +111,16 @@ fun LoginScreen(
                 label = "Correo electrónico",
                 labelStyle = MaterialTheme.typography.labelSmall,
                 labelColor = MaterialTheme.colorScheme.onSecondary,
-                value = state.email,
-                onValueChange = viewModel::onEmailChange
+                value = email,
+                onValueChange = {email = it},
             )
 
             PersonalizedTextField(
                 label = "Contraseña",
                 labelStyle = MaterialTheme.typography.labelSmall,
                 labelColor = MaterialTheme.colorScheme.onSecondary,
-                value = state.password,
-                onValueChange = viewModel::onPasswordChange
+                value = password,
+                onValueChange = {password = it},
             )
 
             Text(
@@ -121,11 +137,12 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp),
-                label = if (state.isLoading) "Inciando Sesión..." else "Iniciar Sesión",
+                label = if (authState is AuthUiState.Loading) "Cargando..." else "Iniciar sesión",
                 labelStyle = MaterialTheme.typography.labelSmall,
                 labelColor = MaterialTheme.colorScheme.onPrimary,
-                onClick = { viewModel.submit() },
-                enabled = !state.isLoading
+                //se lllama a la funcion de login
+                onClick = { authViewModel.login(email,password) },
+                enabled = authState !is AuthUiState.Loading
             )
 
             Spacer(modifier = Modifier.weight(1f))
