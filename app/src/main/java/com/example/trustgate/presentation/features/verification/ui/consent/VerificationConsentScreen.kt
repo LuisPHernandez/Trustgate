@@ -3,12 +3,10 @@ package com.example.trustgate.presentation.features.verification.ui.consent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -18,22 +16,23 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trustgate.core.ui.components.BulletedRow
 import com.example.trustgate.core.ui.components.ContinueButton
 import com.example.trustgate.core.ui.components.TitleText
-import com.example.trustgate.domain.model.VerificationStatus
-import com.example.trustgate.presentation.features.verification.viewmodel.VerificationViewModel
+import com.example.trustgate.presentation.features.verification.VerificationViewModel
 
 @Composable
 fun VerificationConsentScreen(
-    viewModel: VerificationViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    viewModel: VerificationViewModel,
     onContinueClick: () -> Unit = {}
 ) {
-    val checked = viewModel.consent
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -84,11 +83,9 @@ fun VerificationConsentScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
-                checked = checked,
+                checked = state.consent,
                 onCheckedChange = { viewModel.onConsentChange() }
             )
-
-            Spacer(Modifier.width(8.dp))
 
             Text(
                 text = "Doy consentimiento a Trustgate de recopilar, procesar y " +
@@ -100,17 +97,15 @@ fun VerificationConsentScreen(
             )
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-
         ContinueButton(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(55.dp),
-            label = "Continuar",
+            label = if (state.isLoading) "Cargando..." else "Continuar",
             labelStyle = MaterialTheme.typography.labelSmall,
             labelColor = MaterialTheme.colorScheme.onPrimary,
             onClick = onContinueClick,
-            enabled = if (viewModel.status == VerificationStatus.NotStarted) false else checked
+            enabled = state.consent
         )
     }
 }

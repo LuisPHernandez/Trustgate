@@ -1,5 +1,6 @@
 package com.example.trustgate.data.auth.simulated
 
+import com.example.trustgate.domain.datasource.AuthDataSource
 import com.example.trustgate.domain.model.Session
 import com.example.trustgate.domain.model.User
 import kotlinx.coroutines.delay
@@ -10,7 +11,7 @@ import kotlin.random.Random
 class AuthSimulatedDataSource(
     private val latencyMs: Long = 1200L,     // Para simular la latencia de red
     private val failRate: Float = 0.50f      // Para simular errores de red (50% de probabilidad)
-) {
+): AuthDataSource {
     data class UserRecord(
         val user: User,
         val passwordHash: String
@@ -21,7 +22,7 @@ class AuthSimulatedDataSource(
     private var currentSession: Session? = null
 
     // Crea un usuario y devuelve sesión activa, falla si ya existe el email
-    suspend fun signup(name: String, email: String, password: String): Session {
+    override suspend fun signup(name: String, email: String, password: String): Session {
         simulateLatencyOrThrow()
         check(!usersByEmail.containsKey(email)) { "El email ya está registrado" }
 
@@ -37,7 +38,7 @@ class AuthSimulatedDataSource(
     }
 
     // Valida usuario y devuelve sesión activa
-    suspend fun login(email: String, password: String): Session {
+    override suspend fun login(email: String, password: String): Session {
         simulateLatencyOrThrow()
         val record = usersByEmail[email] ?: error("Usuario no existe")
         check(record.passwordHash == password.hash()) { "Credenciales inválidas" }
@@ -45,13 +46,13 @@ class AuthSimulatedDataSource(
     }
 
     // Cierra sesión activa
-    suspend fun logout() {
+    override suspend fun logout() {
         delay(300)
         currentSession = null
     }
 
     // Devuelve la sesión vigente
-    suspend fun currentSession(): Session? {
+    override suspend fun currentSession(): Session? {
         delay(100)
         return currentSession
     }

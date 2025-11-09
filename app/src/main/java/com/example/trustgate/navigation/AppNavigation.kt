@@ -6,36 +6,51 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.example.trustgate.data.auth.AuthRepositoryImpl
-import com.example.trustgate.data.auth.simulated.AuthSimulatedDataSource
+import com.example.trustgate.core.common.RepositoryProvider
 import com.example.trustgate.data.gate.GateRepositoryImpl
 import com.example.trustgate.data.gate.simulated.GateSimulatedDataSource
 import com.example.trustgate.presentation.features.auth.AuthViewModel
+import com.example.trustgate.presentation.features.auth.AuthViewModelFactory
 import com.example.trustgate.presentation.features.home.ui.HomeScreen
-import com.example.trustgate.presentation.features.home.viewmodel.HomeViewModel
-import com.example.trustgate.presentation.features.home.viewmodel.HomeViewModelFactory
+import com.example.trustgate.presentation.features.home.HomeViewModel
+import com.example.trustgate.presentation.features.home.HomeViewModelFactory
 import com.example.trustgate.presentation.features.success.ui.SuccessScreen
-import com.example.trustgate.presentation.features.login.ui.LoginScreen
-import com.example.trustgate.presentation.features.login.viewmodel.LoginViewModel
-import com.example.trustgate.presentation.features.login.viewmodel.LoginViewModelFactory
-import com.example.trustgate.presentation.features.signup.ui.SignupScreen
-import com.example.trustgate.presentation.features.verification.navigation.VerificationNavigation
+import com.example.trustgate.presentation.features.auth.login.ui.LoginScreen
+import com.example.trustgate.presentation.features.auth.signup.ui.SignupScreen
+import com.example.trustgate.presentation.features.verification.VerificationViewModel
+import com.example.trustgate.presentation.features.verification.VerificationViewModelFactory
+import com.example.trustgate.presentation.features.verification.ui.VerificationShell
+import com.example.trustgate.presentation.features.verification.ui.consent.VerificationConsentScreen
+import com.example.trustgate.presentation.features.verification.ui.photo.VerificationPhotoScreen
 
 @Composable
 fun AppNavigation(
     navController: NavHostController = rememberNavController(),
 ) {
+    val authRepo = remember { RepositoryProvider.provideAuthRepository() }
+    val onboardingInfo = remember { RepositoryProvider.provideOnboardingDataStore() }
+    val verificationRepo = remember { RepositoryProvider.provideVerificationRepository() }
+    val authVm: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(
+            authRepo,
+            onboardingInfo
+        )
+    )
+    val verificationVm: VerificationViewModel = viewModel(
+        factory = VerificationViewModelFactory(
+            verificationRepo
+        )
+    )
+
     NavHost(
         navController = navController,
         startDestination = AppScreens.Login.route
     ) {
-        composable(AppScreens.Login.route) {
-            val authViewModel: AuthViewModel = viewModel()
-
-
+        composable(AppScreens.Login.route) { backStackEntry ->
             LoginScreen(
-                authViewModel = authViewModel,
+                viewModel = authVm,
                 onLoginSuccess = {
                     navController.navigate(AppScreens.Home.route) {
                         popUpTo(AppScreens.Login.route) { inclusive = true }
@@ -47,31 +62,55 @@ fun AppNavigation(
             )
         }
 
-        composable(AppScreens.Signup.route) {
-            val authViewModel: AuthViewModel = viewModel()
+        composable(AppScreens.Signup.route) { backStackEntry ->
             SignupScreen(
-                authViewModel = authViewModel,
+                viewModel = authVm,
                 onSignupSuccess = {
                     navController.navigate(AppScreens.Verification.route) {
-                        //se limpia para que no se pueda apachar la flechita atras y regresar
                         popUpTo(AppScreens.Login.route) { inclusive = true }
                     }
                 },
                 onLoginClick = {
-                    //regresa al login
                     navController.popBackStack()
                 }
             )
         }
 
-        composable(AppScreens.Verification.route) {
-            VerificationNavigation(
-                onFinish = {
-                    navController.navigate(AppScreens.Home.route) {
-                        popUpTo(AppScreens.Verification.route) { inclusive = true }
-                    }
+        navigation(
+            route = AppScreens.Verification.route,
+            startDestination = AppScreens.Consent.route
+        ) {
+            composable(AppScreens.Consent.route) {
+                VerificationShell(
+                    viewModel = verificationVm,
+                ) {
+                    VerificationConsentScreen(
+                        viewModel = verificationVm,
+                        onContinueClick = {
+                            if (verificationVm.state.value.consent) {
+                                navController.navigate(AppScreens.Photo.route) {
+                                    popUpTo(AppScreens.Consent.route) { inclusive = true }
+                                }
+                            }
+                        }
+                    )
                 }
-            )
+            }
+
+            composable(AppScreens.Photo.route) {
+                VerificationShell(
+                    viewModel = verificationVm,
+                ) {
+                    VerificationPhotoScreen(
+                        viewModel = verificationVm,
+                        onContinueClick = {
+                            navController.navigate(AppScreens.Home.route) {
+                                popUpTo(AppScreens.Photo.route) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+            }
         }
 
         composable(AppScreens.Home.route) {

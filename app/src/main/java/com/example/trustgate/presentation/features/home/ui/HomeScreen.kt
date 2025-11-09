@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trustgate.core.ui.components.ContinueButton
 import com.example.trustgate.domain.model.GateScanResult
-import com.example.trustgate.presentation.features.home.viewmodel.HomeViewModel
+import com.example.trustgate.presentation.features.home.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

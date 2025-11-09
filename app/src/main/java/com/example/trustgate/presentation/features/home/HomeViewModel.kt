@@ -1,4 +1,4 @@
-package com.example.trustgate.presentation.features.home.viewmodel
+package com.example.trustgate.presentation.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -1,4 +1,4 @@
-package com.example.trustgate.main
+package com.example.trustgate
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,45 +7,26 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.trustgate.core.common.RepositoryProvider
 import com.example.trustgate.core.ui.theme.TrustgateTheme
-import com.example.trustgate.presentation.features.login.ui.LoginScreen
 import com.example.trustgate.navigation.AppNavigation
-import com.google.firebase.Firebase
-import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
+        RepositoryProvider.init(application)
         enableEdgeToEdge()
         setContent {
             TrustgateTheme(dynamicColor = false) {
                 Surface(
-                    modifier = Modifier
+                    modifier = Modifier.Companion
                         .fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     AppNavigation()
                 }
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    TrustgateTheme(dynamicColor = false) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            LoginScreen()
         }
     }
 }

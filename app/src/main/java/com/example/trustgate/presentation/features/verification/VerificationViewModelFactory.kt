@@ -1,4 +1,4 @@
-package com.example.trustgate.presentation.features.verification.viewmodel
+package com.example.trustgate.presentation.features.verification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

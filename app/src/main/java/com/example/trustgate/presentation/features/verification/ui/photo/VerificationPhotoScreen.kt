@@ -2,33 +2,30 @@ package com.example.trustgate.presentation.features.verification.ui.photo
 
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trustgate.core.ui.components.ContinueButton
 import com.example.trustgate.domain.model.VerificationStatus
-import com.example.trustgate.presentation.features.verification.viewmodel.VerificationViewModel
+import com.example.trustgate.presentation.features.verification.VerificationViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -37,14 +34,10 @@ import com.google.accompanist.permissions.shouldShowRationale
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun VerificationPhotoScreen(
-    viewModel: VerificationViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
-    onContinue: () -> Unit
+    viewModel: VerificationViewModel,
+    onContinueClick: () -> Unit
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(viewModel.error) {
-        viewModel.error?.let { snackbarHostState.showSnackbar(it) }
-    }
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     val applicationContext = LocalContext.current
     val controller = remember {
@@ -56,87 +49,113 @@ fun VerificationPhotoScreen(
     }
 
     val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
-    if (cameraPermissionState.status.isGranted) {
-        Column(
+
+    if (!cameraPermissionState.status.isGranted) {
+        PermissionRationale(cameraPermissionState)
+        return
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Surface(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .aspectRatio(0.7f)
+                .padding(20.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            shape = MaterialTheme.shapes.medium
         ) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(0.7f)
-                    .padding(20.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            ) {
+            if (state.lastPhoto == null) {
+                // Mostrar cámara
                 VerificationPhotoCameraPreview(
                     modifier = Modifier.fillMaxSize(),
-                    controller
+                    controller = controller
+                )
+            } else {
+                // Mostrar previsualización
+                Image(
+                    bitmap = state.lastPhoto!!.asImageBitmap(),
+                    contentDescription = "Previsualización del documento",
+                    modifier = Modifier.fillMaxSize()
                 )
             }
+        }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (state.lastPhoto == null) {
                 ContinueButton(
                     modifier = Modifier
                         .weight(1f)
                         .height(55.dp),
-                    label = if (viewModel.isVerifying) "Verificando..." else "Tomar Foto",
+                    label = if (state.isLoading) "Verificando..." else "Tomar Foto",
                     labelStyle = MaterialTheme.typography.labelSmall,
                     labelColor = MaterialTheme.colorScheme.onPrimary,
                     onClick = {
                         viewModel.takePhoto(
                             controller = controller,
-                            onPhotoTaken = viewModel::onTakePhoto,
                             applicationContext = applicationContext
                         )
                     },
-                    enabled = if (viewModel.status == VerificationStatus.Completed) false else true,
-
+                    enabled = state.status != VerificationStatus.Completed
                 )
-
+            } else {
                 ContinueButton(
                     modifier = Modifier
                         .weight(1f)
                         .height(55.dp),
-                    label = "Continuar",
+                    label = "Tomar otra foto",
                     labelStyle = MaterialTheme.typography.labelSmall,
                     labelColor = MaterialTheme.colorScheme.onPrimary,
-                    enabled = if (viewModel.status == VerificationStatus.Completed) true else false,
-                    onClick = onContinue
+                    onClick = { viewModel.discardPhoto() },
+                    enabled = !state.isUploading,
+                )
+                ContinueButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(55.dp),
+                    label = if (state.isUploading) "Subiendo..." else "Confirmar foto",
+                    labelStyle = MaterialTheme.typography.labelSmall,
+                    labelColor = MaterialTheme.colorScheme.onPrimary,
+                    onClick = { viewModel.uploadConfirmedPhoto(onSuccess = onContinueClick) },
+                    enabled = !state.isUploading,
                 )
             }
         }
-    } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize()
-                .widthIn(max = 480.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            val textToShow = if (cameraPermissionState.status.shouldShowRationale) {
-                // If the user has denied the permission
-                "Necesitamos tu permiso para acceder a tu cámara y verificar tu identidad. " +
-                        "Danos permiso y sigamos con el proceso."
-            } else {
-                // If it's the first time the user lands on this feature
-                "Necesitamos tu permiso para acceder a tu cámara y verificar tu identidad. " +
-                        "Danos permiso y sigamos con el proceso. \uD83C\uDF89"
-            }
+    }
+}
 
-            Text(textToShow, textAlign = TextAlign.Center)
-
-            Spacer(Modifier.height(16.dp))
-
-            Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                Text("Permitir acceso a la cámara")
-            }
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun PermissionRationale(cameraPermissionState: com.google.accompanist.permissions.PermissionState) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val textToShow = if (cameraPermissionState.status.shouldShowRationale) {
+            "Necesitamos tu permiso para acceder a tu cámara y verificar tu identidad. Danos permiso y sigamos con el proceso."
+        } else {
+            "Necesitamos tu permiso para acceder a tu cámara y verificar tu identidad. Danos permiso y sigamos con el proceso. 🎉"
         }
+
+        Text(textToShow)
+
+        ContinueButton(
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .height(48.dp),
+            label = "Permitir acceso a la cámara",
+            labelStyle = MaterialTheme.typography.labelSmall,
+            labelColor = MaterialTheme.colorScheme.onPrimary,
+            onClick = { cameraPermissionState.launchPermissionRequest() },
+            enabled = true
+        )
     }
 }

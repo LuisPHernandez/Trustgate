@@ -2,12 +2,12 @@ package com.example.trustgate.data.auth
 
 import com.example.trustgate.domain.model.Session
 import com.example.trustgate.domain.repo.AuthRepository
-import com.example.trustgate.data.auth.simulated.AuthSimulatedDataSource
+import com.example.trustgate.domain.datasource.AuthDataSource
 
 // Implementación del repositorio de autenticación
 class AuthRepositoryImpl(
-    private val source: AuthSimulatedDataSource
-) : AuthRepository {
+    private val source: AuthDataSource
+): AuthRepository {
 
     override suspend fun signup(name: String, email: String, password: String): Session {
         return source.signup(name, email, password)

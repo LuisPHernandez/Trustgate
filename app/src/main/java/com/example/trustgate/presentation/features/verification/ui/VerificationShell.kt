@@ -14,22 +14,26 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trustgate.core.ui.components.TitleText
-import com.example.trustgate.presentation.features.verification.viewmodel.VerificationViewModel
+import com.example.trustgate.presentation.features.verification.VerificationViewModel
 
 @Composable
 fun VerificationShell(
     viewModel: VerificationViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     content: @Composable () -> Unit
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(viewModel.error) {
-        viewModel.error?.let { snackbarHostState.showSnackbar(it) }
+
+    LaunchedEffect(state.error) {
+        state.error?.let { snackbarHostState.showSnackbar(it) }
     }
 
     Scaffold(
@@ -39,7 +43,7 @@ fun VerificationShell(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(top = 100.dp, start = 25.dp, end = 25.dp, bottom = 35.dp),
+                .padding(top = 75.dp, start = 25.dp, end = 25.dp, bottom = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {

@@ -1,8 +1,7 @@
-package com.example.trustgate.presentation.features.signup.ui
+package com.example.trustgate.presentation.features.auth.signup.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,49 +18,50 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trustgate.core.ui.components.ComposedTextButton
 import com.example.trustgate.core.ui.components.ContinueButton
 import com.example.trustgate.core.ui.components.PersonalizedTextField
-import com.example.trustgate.core.ui.components.SmallSectionSpacer
 import com.example.trustgate.core.ui.components.TitleText
 import com.example.trustgate.presentation.features.auth.AuthViewModel
 import androidx.compose.runtime.getValue //
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue //
 import com.example.trustgate.presentation.features.auth.AuthUiState
 
-
-@Preview(showBackground = true)
 @Composable
 fun SignupScreen(
-    authViewModel: AuthViewModel = viewModel(),
+    viewModel: AuthViewModel,
     onLoginClick: () -> Unit = {},
     onSignupSuccess:()  -> Unit ={}
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    //verficair el estado de auth (exitoso o error)
-    val authState by authViewModel.uiState.collectAsState()
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
+
+    // Crear un estado para el Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
 
+    //  Leer el estado de autenticación
+    val state by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(authState) {
-        when(val state = authState){
+    // Observamos cambios en el estado de autenticación
+    LaunchedEffect(state) {
+        when (val s = state){
+            // Cuando el signup es exitoso, navegamos a la siguiente pantalla
             is AuthUiState.Success -> {
+                viewModel.resetState() // Resetea el estado a idle
                 onSignupSuccess()
             }
+            // Cuando el signup falla, mostramos el error en un esnackbar
             is AuthUiState.Error -> {
-                snackbarHostState.showSnackbar(state.message)
-                authViewModel.resetState()
+                snackbarHostState.showSnackbar(s.message)
+                viewModel.resetState() // Resetea el estado a idle
             }
+            // No hacemos nada en los estados Idle o Loading
             else -> Unit
         }
-
     }
-
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -74,11 +74,7 @@ fun SignupScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            TitleText(
-                text = "Crear cuenta"
-            )
-
-            SmallSectionSpacer()
+            TitleText(text = "Crear cuenta")
 
             PersonalizedTextField(
                 label = "Nombre",
@@ -104,28 +100,24 @@ fun SignupScreen(
                 onValueChange = { password = it }
             )
 
-            SmallSectionSpacer()
-
             ContinueButton(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp),
-                label = "Registrarse",
+                label = if (state is AuthUiState.Loading) "Cargando..." else "Registrarse",
                 labelStyle = MaterialTheme.typography.labelSmall,
                 labelColor = MaterialTheme.colorScheme.onPrimary,
                 onClick = {
-                    authViewModel.register(email, password)
+                    viewModel.signup(name, email, password) // Hacemos signup en Firebase
                 } ,
-                enabled = authState !is AuthUiState.Loading
+                enabled = state !is AuthUiState.Loading
             )
-
-            Spacer(modifier = Modifier.weight(1f))
 
             ComposedTextButton(
                 modifier = Modifier.navigationBarsPadding(),
                 staticText = "¿Ya tienes una cuenta?",
                 buttonText = "Inicia Sesión",
-                onClick = onLoginClick
+                onClick = onLoginClick // Navegamos a la pantalla de login
             )
         }
     }
