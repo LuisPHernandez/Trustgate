@@ -2,6 +2,7 @@ package com.example.trustgate.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -20,11 +21,13 @@ import com.example.trustgate.presentation.features.home.HomeViewModelFactory
 import com.example.trustgate.presentation.features.success.ui.SuccessScreen
 import com.example.trustgate.presentation.features.auth.login.ui.LoginScreen
 import com.example.trustgate.presentation.features.auth.signup.ui.SignupScreen
+import com.example.trustgate.presentation.features.splash.SplashRoute
 import com.example.trustgate.presentation.features.verification.VerificationViewModel
 import com.example.trustgate.presentation.features.verification.VerificationViewModelFactory
 import com.example.trustgate.presentation.features.verification.ui.VerificationShell
 import com.example.trustgate.presentation.features.verification.ui.consent.VerificationConsentScreen
 import com.example.trustgate.presentation.features.verification.ui.photo.VerificationPhotoScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavigation(
@@ -47,23 +50,45 @@ fun AppNavigation(
 
     NavHost(
         navController = navController,
-        startDestination = AppScreens.Login.route
+        startDestination = AppScreens.Splash.route
     ) {
+        composable(AppScreens.Splash.route) {
+            SplashRoute(
+                authViewModel = authVm,
+                verificationViewModel = verificationVm,
+                onGoToHome = {
+                    navController.navigate(AppScreens.Home.route) {
+                        popUpTo(AppScreens.Splash.route) { inclusive = true }
+                    }
+                },
+                onGoToLogin = {
+                    navController.navigate(AppScreens.Login.route) {
+                        popUpTo(AppScreens.Splash.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable(AppScreens.Login.route) { backStackEntry ->
+            val scope = rememberCoroutineScope()
+
             LoginScreen(
                 viewModel = authVm,
                 onLoginSuccess = {
-                    when (verificationVm.state.value.status) {
-                        VerificationStatus.Completed -> {
-                            navController.navigate(AppScreens.Home.route) {
-                                popUpTo(AppScreens.Login.route) { inclusive = true }
+                    scope.launch{
+                        val status = verificationVm.refreshAndGetStatus()
+                        when (status) {
+                            VerificationStatus.Completed -> {
+                                navController.navigate(AppScreens.Home.route) {
+                                    popUpTo(AppScreens.Login.route) { inclusive = true }
+                                }
                             }
-                        }
-                        VerificationStatus.NotStarted -> {
-                            navController.navigate(AppScreens.Consent.route)
-                        }
-                        VerificationStatus.ConsentGiven -> {
-                            navController.navigate(AppScreens.Photo.route)
+                            VerificationStatus.NotStarted -> {
+                                navController.navigate(AppScreens.Consent.route)
+                            }
+                            VerificationStatus.ConsentGiven -> {
+                                navController.navigate(AppScreens.Photo.route)
+                            }
                         }
                     }
                 },
@@ -115,6 +140,7 @@ fun AppNavigation(
                     VerificationPhotoScreen(
                         viewModel = verificationVm,
                         onContinueClick = {
+                            verificationVm.restartState()
                             navController.navigate(AppScreens.Home.route) {
                                 popUpTo(AppScreens.Photo.route) { inclusive = true }
                             }
@@ -131,6 +157,7 @@ fun AppNavigation(
             HomeScreen(
                 viewModel = vm,
                 onLogoutClick = {
+                    authVm.logout()
                     navController.navigate(AppScreens.Login.route) {
                         popUpTo(AppScreens.Home.route) { inclusive = true }
                     }

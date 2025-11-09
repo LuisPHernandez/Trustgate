@@ -34,6 +34,7 @@ import com.example.trustgate.core.ui.components.TitleText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import com.example.trustgate.core.ui.components.CheckboxRow
 import com.example.trustgate.presentation.features.auth.AuthUiState
 import com.example.trustgate.presentation.features.auth.AuthViewModel
 
@@ -48,6 +49,9 @@ fun LoginScreen(
 
     // Email guardado para agilizar Login
     val savedEmail by onboardingInfo.lastLoggedInEmail.collectAsState(initial = "")
+
+    // Booleano para saber si el usuario quiere seguir conectado
+    val keepSignedIn by onboardingInfo.keepSignedIn.collectAsState(initial = false)
 
     var email by rememberSaveable { mutableStateOf( "") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -90,7 +94,7 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(top = 75.dp, start = 25.dp, end = 25.dp)
+                .padding(top = 65.dp, start = 25.dp, end = 25.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -128,12 +132,12 @@ fun LoginScreen(
                 onValueChange = {password = it},
             )
 
-            Text(
-                text = "Olvidaste tu contraseña?",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onTertiary,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.End
+            CheckboxRow(
+                label = "Seguir Conectado",
+                checked = keepSignedIn,
+                onCheckedChange = { checked -> viewModel.setKeepSignedIn(checked) },
+                labelStyle = MaterialTheme.typography.labelSmall,
+                labelColor = MaterialTheme.colorScheme.onSecondary,
             )
 
             ContinueButton(

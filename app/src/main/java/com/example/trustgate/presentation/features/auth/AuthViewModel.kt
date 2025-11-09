@@ -18,6 +18,8 @@ class AuthViewModel(
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
+    val keepSignedIn = onboardingInfo.keepSignedIn
+
     fun signup(name: String, email: String, password: String){
         viewModelScope.launch{
             _uiState.value = AuthUiState.Loading
@@ -48,6 +50,18 @@ class AuthViewModel(
                 // Si el login falla, se cambia el estado a Error y se da el mensaje
                 _uiState.value = AuthUiState.Error(AuthErrorMapper.map(e))
             }
+        }
+    }
+
+    fun setKeepSignedIn(value: Boolean) {
+        viewModelScope.launch {
+            onboardingInfo.setKeepSignedIn(value)
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            repo.logout()
         }
     }
 

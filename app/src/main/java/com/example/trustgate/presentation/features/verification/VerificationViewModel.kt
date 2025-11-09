@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trustgate.core.camera.toJpeg
+import com.example.trustgate.domain.model.VerificationStatus
 import com.example.trustgate.domain.repo.VerificationRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,12 +25,6 @@ class VerificationViewModel(
 ): ViewModel() {
     private val _state = MutableStateFlow(VerificationUiState())
     val state: StateFlow<VerificationUiState> = _state.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            _state.update { it.copy(status = repo.status()) }
-        }
-    }
 
     fun takePhoto(
         controller: LifecycleCameraController,
@@ -114,5 +109,26 @@ class VerificationViewModel(
                 _state.update { it.copy(isUploading = false) }
             }
         }
+    }
+
+    suspend fun refreshAndGetStatus(): VerificationStatus {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user == null) {
+            _state.update { it.copy(status = VerificationStatus.NotStarted) }
+            return VerificationStatus.NotStarted
+        }
+
+        return try {
+            val st = repo.status()
+            _state.update { it.copy(status = st, error = null) }
+            st
+        } catch (e: Exception) {
+            _state.update { it.copy(error = e.message ?: "Error leyendo verificación") }
+            VerificationStatus.NotStarted
+        }
+    }
+
+    fun restartState() {
+        _state.update { VerificationUiState() }
     }
 }

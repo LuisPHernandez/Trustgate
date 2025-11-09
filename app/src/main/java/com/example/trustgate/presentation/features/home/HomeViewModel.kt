@@ -2,7 +2,6 @@ package com.example.trustgate.presentation.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.trustgate.domain.model.GateScanResult
 import com.example.trustgate.domain.repo.GateRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,17 +10,11 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class HomeState(
-    val isScanning: Boolean = false,
-    val error: String? = null,
-    val lastResult: GateScanResult? = null
-)
-
 class HomeViewModel(
     private val gate: GateRepository
 ) : ViewModel() {
-    private val _ui = MutableStateFlow(HomeState())
-    val ui: StateFlow<HomeState> = _ui
+    private val _ui = MutableStateFlow(HomeUiState())
+    val ui: StateFlow<HomeUiState> = _ui
 
     fun scan() {
         viewModelScope.launch {

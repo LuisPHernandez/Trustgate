@@ -1,6 +1,7 @@
 package com.example.trustgate.navigation
 
 sealed class AppScreens(val route: String) {
+    object Splash: AppScreens("splash")
     object Login: AppScreens("login")
     object Signup: AppScreens("signup")
     object Verification: AppScreens("verification")
