@@ -62,7 +62,8 @@ fun VerificationShell(
 
             Surface(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
+                    .fillMaxWidth()
                     .padding(16.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = RoundedCornerShape(24.dp),

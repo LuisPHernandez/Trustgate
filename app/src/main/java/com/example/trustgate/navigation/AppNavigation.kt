@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.trustgate.core.common.RepositoryProvider
 import com.example.trustgate.data.gate.GateRepositoryImpl
 import com.example.trustgate.data.gate.simulated.GateSimulatedDataSource
+import com.example.trustgate.domain.model.VerificationStatus
 import com.example.trustgate.presentation.features.auth.AuthViewModel
 import com.example.trustgate.presentation.features.auth.AuthViewModelFactory
 import com.example.trustgate.presentation.features.home.ui.HomeScreen
@@ -52,8 +53,18 @@ fun AppNavigation(
             LoginScreen(
                 viewModel = authVm,
                 onLoginSuccess = {
-                    navController.navigate(AppScreens.Home.route) {
-                        popUpTo(AppScreens.Login.route) { inclusive = true }
+                    when (verificationVm.state.value.status) {
+                        VerificationStatus.Completed -> {
+                            navController.navigate(AppScreens.Home.route) {
+                                popUpTo(AppScreens.Login.route) { inclusive = true }
+                            }
+                        }
+                        VerificationStatus.NotStarted -> {
+                            navController.navigate(AppScreens.Consent.route)
+                        }
+                        VerificationStatus.ConsentGiven -> {
+                            navController.navigate(AppScreens.Photo.route)
+                        }
                     }
                 },
                 onSignupClick = {

@@ -25,6 +25,12 @@ class VerificationViewModel(
     private val _state = MutableStateFlow(VerificationUiState())
     val state: StateFlow<VerificationUiState> = _state.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            _state.update { it.copy(status = repo.status()) }
+        }
+    }
+
     fun takePhoto(
         controller: LifecycleCameraController,
         applicationContext: Context

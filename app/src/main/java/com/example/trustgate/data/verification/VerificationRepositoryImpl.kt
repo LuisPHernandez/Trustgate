@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 // Implementación del repositorio de verificación de identidad
 class VerificationRepositoryImpl(
     private val source: VerificationRemoteDataSource
-) : VerificationRepository {
+): VerificationRepository {
     override suspend fun giveConsent(): VerificationStatus {
         val user = FirebaseAuth.getInstance().currentUser
         val uid = requireNotNull(user?.uid) { "No hay usuario autenticado" }
