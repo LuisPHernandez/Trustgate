@@ -3,6 +3,7 @@ package com.example.trustgate.data.auth.simulated
 import com.example.trustgate.domain.datasource.AuthDataSource
 import com.example.trustgate.domain.model.Session
 import com.example.trustgate.domain.model.User
+import com.example.trustgate.domain.model.UserRole
 import kotlinx.coroutines.delay
 import java.util.UUID
 import kotlin.random.Random
@@ -67,7 +68,7 @@ class AuthSimulatedDataSource(
 
     private fun startSessionFor(user: User): Session {
         val token = "token-${UUID.randomUUID()}"
-        val session = Session(token = token, user = user)
+        val session = Session(token = token, user = user, role = UserRole.VISITOR)
         currentSession = session
         return session
     }

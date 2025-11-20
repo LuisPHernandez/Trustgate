@@ -34,12 +34,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trustgate.core.ui.components.ContinueButton
-import com.example.trustgate.domain.model.GateScanResult
 import com.example.trustgate.presentation.features.home.HomeViewModel
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanQRCode
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import android.net.Uri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,15 +52,20 @@ fun HomeScreen(
     val coroutineScope = rememberCoroutineScope()
 
 
-    //libreria para QR Quickie
+    // Libreria para QR Quickie
     val scanQRCodeLauncher =
         rememberLauncherForActivityResult(ScanQRCode()) { result: QRResult ->
             when (result) {
                 is QRResult.QRSuccess -> {
                     val raw = result.content.rawValue.orEmpty()
-                    val gateName = raw
-                    onSuccess(gateName)
-                    viewModel.clear()
+                    val gateUid = parseGateUidFromQr(raw)
+                    if (gateUid != null) {
+                        viewModel.sendIdToGate(gateUid)
+                    } else {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("QR no válido")
+                        }
+                    }
                 }
 
 
@@ -79,26 +83,20 @@ fun HomeScreen(
                 }
             }
         }
-    // Navegar cuando hay scan exitoso
-    LaunchedEffect(state.lastResult) {
-        when (state.lastResult) {
-            is GateScanResult.Success -> {
-                onSuccess((state.lastResult as GateScanResult.Success).gate.name)
-                viewModel.clear()
-            }
-            GateScanResult.Denied -> {
-                snackbarHostState.showSnackbar("Acceso denegado")
-                viewModel.clear()
-            }
-            null -> Unit
-        }
-    }
 
     // Mostrar error de flujo
     LaunchedEffect(state.error) {
         state.error?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clear()
+        }
+    }
+
+    // Navegar cuando el envío al gate fue exitoso
+    LaunchedEffect(state.lastSentGateUid) {
+        state.lastSentGateUid?.let { gateUid ->
+            onSuccess(gateUid)
+            viewModel.clearLastSentGateUid()
         }
     }
 
@@ -172,5 +170,18 @@ fun HomeScreen(
                 )
             }
         }
+    }
+}
+
+private fun parseGateUidFromQr(raw: String): String? {
+    return try {
+        val uri = Uri.parse(raw)
+        if (uri.scheme == "trustgate" && uri.host == "gate") {
+            uri.getQueryParameter("uid")
+        } else {
+            null
+        }
+    } catch (e: Exception) {
+        null
     }
 }

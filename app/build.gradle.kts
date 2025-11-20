@@ -73,4 +73,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage.ktx)
-    implementation("io.github.g00fy2.quickie:quickie-bundled:1.11.0")}
+    implementation("io.github.g00fy2.quickie:quickie-bundled:1.11.0")
+    implementation("com.google.zxing:core:3.5.3")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+}

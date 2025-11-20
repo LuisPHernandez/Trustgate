@@ -9,4 +9,5 @@ sealed class AppScreens(val route: String) {
     object Photo: AppScreens("verification/photo")
     object Home: AppScreens("home")
     object Success : AppScreens("success")
+    object GateHome : AppScreens("gate_home")
 }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.trustgate.domain.model.UserRole
 import com.example.trustgate.domain.model.VerificationStatus
 import com.example.trustgate.presentation.features.auth.AuthViewModel
 import com.example.trustgate.presentation.features.verification.VerificationViewModel
@@ -17,7 +18,8 @@ import kotlinx.coroutines.flow.first
 fun SplashRoute(
     authViewModel: AuthViewModel,
     verificationViewModel: VerificationViewModel,
-    onGoToHome: () -> Unit,
+    onGoToVisitorHome: () -> Unit,
+    onGoToGateHome: () -> Unit,
     onGoToLogin: () -> Unit,
 ) {
     Box(
@@ -30,11 +32,36 @@ fun SplashRoute(
     LaunchedEffect(Unit) {
         val keep = authViewModel.keepSignedIn.first()
         val user = FirebaseAuth.getInstance().currentUser
-        val state = verificationViewModel.refreshAndGetStatus()
-        if (keep && user != null && state == VerificationStatus.Completed) {
-            onGoToHome()
-        } else {
+
+        // Si no se marcó recordar sesión o no hay usuario, se manda a Login
+        if (!keep || user == null) {
             onGoToLogin()
+            return@LaunchedEffect
+        }
+
+        val session = authViewModel.currentSession()
+
+        // Si no hasy sesión se manda a login
+        if (session == null) {
+            onGoToLogin()
+            return@LaunchedEffect
+        }
+
+        when (session.role) {
+            // Cuando el rol del usuario es gate, se manda a su pantalla
+            UserRole.GATE -> {
+                onGoToGateHome()
+            }
+
+            // Cuando el rol del usuario es visitante, se manda a su pantalla
+            UserRole.VISITOR -> {
+                val state = verificationViewModel.refreshAndGetStatus()
+                if (state == VerificationStatus.Completed) {
+                    onGoToVisitorHome()
+                } else {
+                    onGoToLogin()
+                }
+            }
         }
     }
 }

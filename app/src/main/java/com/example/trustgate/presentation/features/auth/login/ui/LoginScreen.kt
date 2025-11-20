@@ -130,6 +130,7 @@ fun LoginScreen(
                 labelColor = MaterialTheme.colorScheme.onSecondary,
                 value = password,
                 onValueChange = {password = it},
+                isPassword = true
             )
 
             CheckboxRow(

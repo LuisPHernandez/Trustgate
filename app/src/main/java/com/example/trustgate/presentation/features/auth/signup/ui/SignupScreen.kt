@@ -100,7 +100,8 @@ fun SignupScreen(
                 labelStyle = MaterialTheme.typography.labelSmall,
                 labelColor = MaterialTheme.colorScheme.onSecondary,
                 value = password,
-                onValueChange = { password = it }
+                onValueChange = { password = it },
+                isPassword = true
             )
 
             ContinueButton(

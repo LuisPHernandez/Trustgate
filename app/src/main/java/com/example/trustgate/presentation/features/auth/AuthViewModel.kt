@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.trustgate.core.common.AuthErrorMapper
 import com.example.trustgate.data.local.OnboardingDataStore
+import com.example.trustgate.domain.model.Session
 import com.example.trustgate.domain.repo.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -68,6 +69,11 @@ class AuthViewModel(
     // Se reinicia el estado de autenticación
     fun resetState(){
         _uiState.value = AuthUiState.Idle
+    }
+
+    // Devuelve la sesión actual
+    suspend fun currentSession(): Session? {
+        return repo.currentSession()
     }
 
 }
