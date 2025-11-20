@@ -31,7 +31,6 @@ class HomeViewModel(
             _ui.update { it.copy(isScanning = false) }
         }
     }
-
     // Limpiar resultados y errores después de mostrarlos/usarlos
     fun clear() {
         _ui.update { it.copy(lastResult = null, error = null) }

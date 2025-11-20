@@ -73,4 +73,4 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage.ktx)
-}
+    implementation("io.github.g00fy2.quickie:quickie-bundled:1.11.0")}

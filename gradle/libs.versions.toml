@@ -17,6 +17,7 @@ cameraView = "1.5.0"
 material3 = "1.4.0"
 googleServices = "4.4.4"
 datastore = "1.1.1"
+quickie = "1.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +49,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-storage-ktx = { module = "com.google.firebase:firebase-storage" }
+quickie = { module = "com.github.G00fY2:quickie", version.ref = "quickie" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

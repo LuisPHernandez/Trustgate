@@ -1,5 +1,6 @@
 package com.example.trustgate.presentation.features.home.ui
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +36,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.trustgate.core.ui.components.ContinueButton
 import com.example.trustgate.domain.model.GateScanResult
 import com.example.trustgate.presentation.features.home.HomeViewModel
+import io.github.g00fy2.quickie.QRResult
+import io.github.g00fy2.quickie.ScanQRCode
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +50,35 @@ fun HomeScreen(
 ) {
     val state by viewModel.ui.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
+
+    //libreria para QR Quickie
+    val scanQRCodeLauncher =
+        rememberLauncherForActivityResult(ScanQRCode()) { result: QRResult ->
+            when (result) {
+                is QRResult.QRSuccess -> {
+                    val raw = result.content.rawValue.orEmpty()
+                    val gateName = raw
+                    onSuccess(gateName)
+                    viewModel.clear()
+                }
+
+
+                QRResult.QRUserCanceled -> Unit
+                is QRResult.QRError -> {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Error al escanear el QR")
+                    }
+                }
+
+                QRResult.QRMissingPermission -> {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Permisos de cámara denegados")
+                    }
+                }
+            }
+        }
     // Navegar cuando hay scan exitoso
     LaunchedEffect(state.lastResult) {
         when (state.lastResult) {
@@ -130,11 +164,11 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .height(55.dp),
-                    label = if (state.isScanning) "Escaneando..." else "Escanear",
+                    label = "Escanear",
                     labelStyle = MaterialTheme.typography.labelSmall,
                     labelColor = MaterialTheme.colorScheme.onPrimary,
-                    onClick = { viewModel.scan() },
-                    enabled = !state.isScanning
+                    onClick = { scanQRCodeLauncher.launch(null) },
+                    enabled = true
                 )
             }
         }
